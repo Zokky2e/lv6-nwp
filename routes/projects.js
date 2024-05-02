@@ -62,6 +62,65 @@ router.get("/", (req, res) => {
 	});
 });
 
+router.get("/my", (req, res) => {
+	if (req.session && req.session.user) {
+		const userId = req.session.user.id;
+		connection.query(
+			`
+			SELECT * FROM projects
+			inner join project_user on project_user.project_id = projects.id
+			where projects.leader_id = ?
+		`,
+			[userId],
+			(err, results) => {
+				if (err) {
+					console.error("Error fetching projects:", err);
+					res.status(500).json({
+						message: "Error fetching projects",
+					});
+					return;
+				}
+				res.render("projects/my-projects", {
+					title: "My Projects",
+					projects: results,
+				});
+			}
+		);
+	} else {
+		res.redirect("/");
+	}
+});
+
+router.get("/assigned", (req, res) => {
+	if (req.session && req.session.user) {
+		const userId = req.session.user.id;
+		console.log(userId);
+		connection.query(
+			`
+			SELECT * FROM projects
+			inner join project_user on project_user.project_id = projects.id
+			where project_user.user_id = ?
+			`,
+			[userId],
+			(err, results) => {
+				if (err) {
+					console.error("Error fetching projects:", err);
+					res.status(500).json({
+						message: "Error fetching projects",
+					});
+					return;
+				}
+				res.render("projects/assigned-projects", {
+					title: "Assigned Projects",
+					projects: results,
+				});
+			}
+		);
+	} else {
+		res.redirect("/");
+	}
+});
+
 router.get("/:id", (req, res) => {
 	const projectId = req.params.id;
 	connection.query(

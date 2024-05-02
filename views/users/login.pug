@@ -1,0 +1,19 @@
+extends ../layout
+
+block content
+    form(action="/users/login", method="post")
+        div
+            label(for="email") Email:
+            input(type="email", id="email", name="email", required)
+        div
+            label(for="password") Password:
+            input(type="password", id="password", name="password", required)
+        div
+            button(type="submit") Login
+        div.error-message
+            if errorMessage
+                p.errorMessage= errorMessage
+
+    div or register here
+    form(action="/users/register", method="get")
+        button(type="submit") Register

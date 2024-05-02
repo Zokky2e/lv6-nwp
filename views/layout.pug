@@ -1,0 +1,17 @@
+doctype html
+html
+  head
+    title= title
+    link(rel='stylesheet', href='/stylesheets/style.css')
+  body
+    div.navbar
+      h1= title
+      div.navbar
+        form(action="/", method="get")
+          button(type="submit") Home
+        if isLoggedIn
+          form(action="/projects/my", method="get")
+            button(type="submit") My Projects
+          form(action="/projects/assigned", method="get")
+            button(type="submit") Assigned Projects
+    block content
