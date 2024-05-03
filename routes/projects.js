@@ -19,36 +19,46 @@ connection.connect((err) => {
 	console.log("Connected to MySQL database");
 });
 
-router.post("/", (req, res) => {
-	const {
-		naziv,
-		opis,
-		cijena,
-		obavljeniPoslovi,
-		datumPocetka,
-		datumZavrsetka,
-		leaderId,
-	} = req.body;
-	const project = {
-		naziv,
-		opis,
-		cijena,
-		obavljeniPoslovi,
-		datumPocetka,
-		datumZavrsetka,
-		leader_id: leaderId,
-	};
-	connection.query("INSERT INTO projects SET ?", project, (err, result) => {
-		if (err) {
-			console.error("Error creating project:", err);
-			res.status(500).json({ message: "Error creating project" });
-			return;
-		}
-		res.status(201).json({
-			message: "Project created successfully",
-			id: result.insertId,
-		});
-	});
+router.get("/new-project", (req, res) => {
+	res.render("projects/form-projects", { title: "Add New Project" });
+});
+
+router.post("/new", (req, res) => {
+	if (req.session && req.session.user) {
+		const userId = req.session.user.id;
+		console.log(req.session.user);
+		const {
+			naziv_projekta,
+			opis_projekta,
+			cijena_projekta,
+			datum_pocetka,
+			datum_zavrsetka,
+		} = req.body;
+		const project = {
+			naziv_projekta,
+			opis_projekta,
+			cijena_projekta,
+			datum_pocetka,
+			datum_zavrsetka,
+			leader_id: userId,
+			created_at: new Date(),
+			updated_at: new Date(),
+		};
+		connection.query(
+			"INSERT INTO projects SET ?",
+			project,
+			(err, result) => {
+				if (err) {
+					console.error("Error creating project:", err);
+
+					return;
+				}
+				res.redirect("/projects/my");
+			}
+		);
+	} else {
+		res.redirect("/");
+	}
 });
 
 router.get("/", (req, res) => {
@@ -65,12 +75,13 @@ router.get("/", (req, res) => {
 router.get("/my", (req, res) => {
 	if (req.session && req.session.user) {
 		const userId = req.session.user.id;
+		console.log(userId);
 		connection.query(
 			`
-			SELECT * FROM projects
-			inner join project_user on project_user.project_id = projects.id
-			where projects.leader_id = ?
-		`,
+            SELECT projects.id, projects.naziv_projekta, projects.opis_projekta, projects.cijena_projekta, projects.datum_pocetka, projects.datum_zavrsetka
+            FROM projects
+            WHERE projects.leader_id = ?
+        `,
 			[userId],
 			(err, results) => {
 				if (err) {
@@ -80,9 +91,28 @@ router.get("/my", (req, res) => {
 					});
 					return;
 				}
-				res.render("projects/my-projects", {
-					title: "My Projects",
-					projects: results,
+				console.log(results);
+				// Format the results before rendering
+				const formattedProjects = results.map((project) => ({
+					id: project.id,
+					naziv_projekta: project.naziv_projekta,
+					opis_projekta: project.opis_projekta,
+					cijena_projekta: project.cijena_projekta,
+					datum_pocetka: project.datum_pocetka,
+					datum_zavrsetka: project.datum_zavrsetka,
+				}));
+				getAvailableUsers(userId, (err, availableUsers) => {
+					if (err) {
+						res.status(500).json({
+							message: "Error fetching available users",
+						});
+						return;
+					}
+					res.render("projects/my-projects", {
+						title: "My Projects",
+						projects: formattedProjects,
+						availableUsers: availableUsers,
+					});
 				});
 			}
 		);
@@ -90,6 +120,24 @@ router.get("/my", (req, res) => {
 		res.redirect("/");
 	}
 });
+
+function getAvailableUsers(userId, callback) {
+	connection.query(
+		`
+        SELECT * FROM users
+        WHERE id != ?
+    `,
+		[userId],
+		(err, results) => {
+			if (err) {
+				console.error("Error fetching available users:", err);
+				callback(err, null);
+				return;
+			}
+			callback(null, results);
+		}
+	);
+}
 
 router.get("/assigned", (req, res) => {
 	if (req.session && req.session.user) {

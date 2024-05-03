@@ -1,6 +1,8 @@
 extends ../layout
 
 block content
+  form(action="/projects/new-project", method="get")
+    button(type="submit") Add New
   table
     thead
       tr
@@ -12,8 +14,8 @@ block content
     tbody
       each project in projects
         tr
-          td= project.name
-          td= project.description
+          td= project.naziv_projekta
+          td= project.opis_projekta
           td
             // Dropdown for selecting users
             select(name=`assign-${project.id}`)

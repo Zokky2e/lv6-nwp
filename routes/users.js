@@ -111,7 +111,11 @@ router.post("/login", async function (req, res, next) {
 					});
 					return;
 				}
-				req.session.user = { name: user.name, email: user.email };
+				req.session.user = {
+					name: user.name,
+					email: user.email,
+					id: user.id,
+				};
 				res.redirect("/");
 			}
 		);

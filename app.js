@@ -37,6 +37,7 @@ connection.connect((err) => {
 		console.error("Error connecting to MySQL database:", err);
 		return;
 	}
+
 	console.log("Connected to MySQL database");
 });
 

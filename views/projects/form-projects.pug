@@ -1,0 +1,25 @@
+extends ../layout
+
+block content
+	form(action="/projects/new", method="post")
+		div.form-group
+			label(for="naziv_projekta") Naziv Projekta:
+			input(type="text", id="naziv_projekta", name="naziv_projekta", required)
+
+		div.form-group
+			label(for="opis_projekta") Opis Projekta:
+			textarea(id="opis_projekta", name="opis_projekta", rows="4", required)
+
+		div.form-group
+			label(for="cijena_projekta") Cijena Projekta:
+			input(type="number", id="cijena_projekta", name="cijena_projekta", required)
+
+		div.form-group
+			label(for="datum_pocetka") Datum Početka:
+			input(type="date", id="datum_pocetka", name="datum_pocetka", required)
+
+		div.form-group
+			label(for="datum_zavrsetka") Datum Završetka:
+			input(type="date", id="datum_zavrsetka", name="datum_zavrsetka", required)
+
+		button(type="submit") Submit
