@@ -2,6 +2,8 @@
 
 Laboratorijska Vježba 6 - Node.js, Express i MongoDB
 
+Laboratorijska Vježba 7 - Node.js autentifikacija
+
 ## Pokretanje
 
 ### Kloniranje projekta
