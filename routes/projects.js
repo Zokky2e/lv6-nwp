@@ -75,7 +75,6 @@ router.get("/", (req, res) => {
 router.get("/my", (req, res) => {
 	if (req.session && req.session.user) {
 		const userId = req.session.user.id;
-		console.log(userId);
 		connection.query(
 			`
             SELECT projects.id, projects.naziv_projekta, projects.opis_projekta, projects.cijena_projekta, projects.datum_pocetka, projects.datum_zavrsetka
@@ -91,12 +90,11 @@ router.get("/my", (req, res) => {
 					});
 					return;
 				}
-				console.log(results);
-				// Format the results before rendering
 				const formattedProjects = results.map((project) => ({
 					id: project.id,
 					naziv_projekta: project.naziv_projekta,
 					opis_projekta: project.opis_projekta,
+					obavljeni_poslovi: project.obavljeni_poslovi,
 					cijena_projekta: project.cijena_projekta,
 					datum_pocetka: project.datum_pocetka,
 					datum_zavrsetka: project.datum_zavrsetka,
@@ -142,10 +140,12 @@ function getAvailableUsers(userId, callback) {
 router.get("/assigned", (req, res) => {
 	if (req.session && req.session.user) {
 		const userId = req.session.user.id;
-		console.log(userId);
 		connection.query(
 			`
-			SELECT * FROM projects
+			SELECT 	projects.id, projects.naziv_projekta, 
+					projects.opis_projekta,	projects.obavljeni_poslovi, 
+					projects.datum_pocetka, projects.datum_zavrsetka
+			from projects
 			inner join project_user on project_user.project_id = projects.id
 			where project_user.user_id = ?
 			`,
@@ -158,9 +158,17 @@ router.get("/assigned", (req, res) => {
 					});
 					return;
 				}
+				const formattedProjects = results.map((project) => ({
+					id: project.id,
+					naziv_projekta: project.naziv_projekta,
+					opis_projekta: project.opis_projekta,
+					obavljeni_poslovi: project.obavljeni_poslovi,
+					datum_pocetka: project.datum_pocetka,
+					datum_zavrsetka: project.datum_zavrsetka,
+				}));
 				res.render("projects/assigned-projects", {
 					title: "Assigned Projects",
-					projects: results,
+					projects: formattedProjects,
 				});
 			}
 		);
@@ -243,7 +251,7 @@ router.post("/:projectId/addMember/:userId", (req, res) => {
 	const projectId = req.params.projectId;
 	const userId = req.params.userId;
 	connection.query(
-		"INSERT INTO user_project (project_id, user_id) VALUES (?, ?)",
+		"INSERT INTO project_user (project_id, user_id) VALUES (?, ?)",
 		[projectId, userId],
 		(err, result) => {
 			if (err) {
@@ -254,6 +262,26 @@ router.post("/:projectId/addMember/:userId", (req, res) => {
 				return;
 			}
 			res.json({ message: "Member added to project successfully" });
+		}
+	);
+});
+
+router.post("/:projectId/leave", async (req, res) => {
+	const projectId = req.params.projectId;
+	const userId = req.session.user.id;
+	console.log(userId);
+	connection.query(
+		"DELETE FROM project_user where project_user.project_id = ? and project_user.user_id = ?",
+		[projectId, userId],
+		(err, result) => {
+			if (err) {
+				console.error("Error deleting member  from project:", err);
+				res.status(500).json({
+					message: "Error deleting member from project",
+				});
+				return;
+			}
+			res.json({ message: "Member deleted from project successfully" });
 		}
 	);
 });

@@ -1,30 +1,23 @@
 extends ../layout
 
-block content
-  h1 My Projects
-
+block content  
   table
-    thead
-      tr
-        th Project Name
-        th Description
-        th Assigned To
-        th Options
-
-    tbody
-      each project in projects
+  if projects.length > 0
+      thead
         tr
-          td= project.name
-          td= project.description
-          td
-            // Dropdown for selecting users
-            select(name=`assign-${project.id}`)
-              option(value='') -- Select User --
-              each user in availableUsers
-                option(value=user.id)= user.name
-          td
-            button(type='button' onclick=`leaveProject(${project.id})`) Leave
+          th Naziv Projekta
+          th Opis Projekta
+          th Obavljeni Poslovi
+          th Options
 
-//- script.
-//- 	function leaveProject(projectId) {
-//-   }
+      tbody
+        each project in projects
+          tr
+            td= project.naziv_projekta
+            td= project.opis_projekta 
+            td= project.obavljeni_poslovi
+            td
+              button(type='button') View
+              button(type='button' onclick=`leaveProject(${project.id})`) Leave
+
+  script(src="/javascripts/project-methods.js")
