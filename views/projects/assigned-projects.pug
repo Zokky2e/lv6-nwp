@@ -17,7 +17,7 @@ block content
             td= project.opis_projekta 
             td= project.obavljeni_poslovi
             td
-              button(type='button') View
+              button(type='button' onclick=`viewProject(${project.id})`) View
               button(type='button' onclick=`leaveProject(${project.id})`) Leave
 
   script(src="/javascripts/project-methods.js")

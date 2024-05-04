@@ -30,6 +30,6 @@ block content
                   option(value=user.id)= user.name
             td
               button(type='button' onclick=`assignUser(${project.id})`) Assign
-              button(type='button') View
+              button(type='button' onclick=`viewProject(${project.id})`) View
 
   script(src="/javascripts/project-methods.js")

@@ -179,20 +179,36 @@ router.get("/assigned", (req, res) => {
 
 router.get("/:id", (req, res) => {
 	const projectId = req.params.id;
+	console.log(projectId);
 	connection.query(
 		"SELECT * FROM projects WHERE id = ?",
 		projectId,
 		(err, results) => {
 			if (err) {
 				console.error("Error fetching project:", err);
-				res.status(500).json({ message: "Error fetching project" });
+				res.status(500).render("error", {
+					message: "Error fetching project",
+				});
 				return;
 			}
 			if (results.length === 0) {
-				res.status(404).json({ message: "Project not found" });
+				console.log(results);
+				res.status(404).render("error", {
+					message: "Project not found",
+				});
 				return;
 			}
-			res.json(results[0]);
+			const formattedProjects = results.map((project) => ({
+				id: project.id,
+				naziv_projekta: project.naziv_projekta,
+				opis_projekta: project.opis_projekta,
+				obavljeni_poslovi: project.obavljeni_poslovi,
+				datum_pocetka: project.datum_pocetka,
+				datum_zavrsetka: project.datum_zavrsetka,
+			}));
+			res.render("projects/view-project", {
+				project: formattedProjects[0],
+			});
 		}
 	);
 });

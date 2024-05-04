@@ -45,3 +45,18 @@ async function assignUser(projectId) {
 		window.location.href = "/error";
 	}
 }
+
+async function viewProject(projectId) {
+	try {
+		const response = await fetch(`/projects/${projectId}`);
+
+		if (!response.ok) {
+			throw new Error("Failed to load project");
+		}
+
+		window.location.href = `/projects/${projectId}`;
+	} catch (error) {
+		console.error("Error loading project:", error);
+		window.location.href = "/error";
+	}
+}

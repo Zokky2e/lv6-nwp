@@ -1,0 +1,20 @@
+extends ../layout
+
+block content
+  h1= project.naziv_projekta
+  table
+    tr
+      td Naziv Projekta:
+      td= project.naziv_projekta
+    tr
+      td Opis Projekta:
+      td= project.opis_projekta
+    tr
+      td Obavljeni Poslovi:
+      td= project.obavljeni_poslovi
+    tr
+      td Datum Početka:
+      td= project.datum_pocetka
+    tr
+      td Datum Završetka:
+      td= project.datum_zavrsetka
